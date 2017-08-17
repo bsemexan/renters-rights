@@ -58,10 +58,14 @@ class RentersRightsController < ApplicationController
   end 
 
   def tax_rate_area_get
+    # create the connection
     conn = Faraday.new do |c|
+      # the website returns a 302, so we need to follow redirects to get the html page
       c.use FaradayMiddleware::FollowRedirects
       c.adapter Faraday.default_adapter
     end
+
+    # get the html page
     response = conn.get('https://www.sccassessor.org/apps/SearchResult.aspx', {
       SFrom: 'rp',
       SType: 'rp',
@@ -69,11 +73,13 @@ class RentersRightsController < ApplicationController
       addValue: '2920 HUFF AV SAN JOSE'
     })
 
+    # this is for testing. write a tmp file of the result.
     # parse this html...
     File.binwrite('/tmp/result.html', response.body)
   end 
 
   def tax_rate_area_parse
+    # on this page, parse the html file and extract the code so we can check it.
     html = File.binread('/tmp/result.html')
     doc = Nokogiri::HTML(html)
     tax_rate_div = doc.at_xpath('//*[@id="tab-5"]//*[contains(text(), "TAX RATE AREA INFORMATION")]') 

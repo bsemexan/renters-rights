@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+require 'faraday'
+require 'pp'
+require 'nokogiri'
+
 class RentersRightsController < ApplicationController
   layout "renters_rights"
 
@@ -51,6 +55,29 @@ class RentersRightsController < ApplicationController
   end 
 
   def resources
+  end 
+
+  def tax_rate_area_get
+    conn = Faraday.new do |c|
+      c.use FaradayMiddleware::FollowRedirects
+      c.adapter Faraday.default_adapter
+    end
+    response = conn.get('https://www.sccassessor.org/apps/SearchResult.aspx', {
+      SFrom: 'rp',
+      SType: 'rp',
+      STab: 'address',
+      addValue: '2920 HUFF AV SAN JOSE'
+    })
+
+    # parse this html...
+    File.binwrite('/tmp/result.html', response.body)
+  end 
+
+  def tax_rate_area_parse
+    html = File.binread('/tmp/result.html')
+    doc = Nokogiri::HTML(html)
+    tax_rate_div = doc.at_xpath('//*[@id="tab-5"]//*[contains(text(), "TAX RATE AREA INFORMATION")]') 
+    pp tax_rate_div.text
   end 
 
   private

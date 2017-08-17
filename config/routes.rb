@@ -13,4 +13,6 @@ Rails.application.routes.draw do
   get '/tenant-relocation', to: 'renters_rights#tenant_relocation'
   get '/eviction-resources', to: 'renters_rights#eviction_resources'
   get '/resources', to: 'renters_rights#resources'
+  get '/tax-rate-area-get', to: 'renters_rights#tax_rate_area_get'
+  get '/tax-rate-area-parse', to: 'renters_rights#tax_rate_area_parse'
 end
